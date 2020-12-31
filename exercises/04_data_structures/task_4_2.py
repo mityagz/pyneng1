@@ -9,3 +9,6 @@
 """
 
 mac = "AAAA:BBBB:CCCC"
+m0 = mac.replace(":", ".")
+print(m0)
+#Out[172]: 'AAAA.BBBB.CCCC'
