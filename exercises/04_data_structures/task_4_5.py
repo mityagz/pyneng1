@@ -17,3 +17,7 @@ command2 = "switchport trunk allowed vlan 1,3,8,9"
 s0 = list(set([ int(v0) for v0 in command1.split(" ")[-1].split(",") if v0.isdigit() ]) & set([ int(v1) for v1 in command2.split(" ")[-1].split(",") if v1.isdigit() ]))
 s0.sort()
 print(s0)
+
+s1 = list(set(command1.split(" ")[-1].split(",")) & set(command2.split(" ")[-1].split(",")))
+s1.sort()
+print(s1)
