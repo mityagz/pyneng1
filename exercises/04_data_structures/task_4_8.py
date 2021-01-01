@@ -20,3 +20,5 @@
 """
 
 ip = "192.168.3.1"
+ipv4=ip.split(".")
+print("{:10} {:10} {:10} {:10}\n{:10} {:10} {:10} {:10}".format(ipv4[0], ipv4[1], ipv4[2], ipv4[3], bin(int(ipv4[0])), bin(int(ipv4[1])), bin(int(ipv4[2])), bin(int(ipv4[3]))))
