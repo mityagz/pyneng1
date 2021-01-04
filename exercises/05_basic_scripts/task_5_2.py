@@ -33,36 +33,19 @@ mask = prefix.split("/")[1]
 print(net, mask)
 
 
-n0 = net.split(".")[0]
-n1 = net.split(".")[1]
-n2 = net.split(".")[2]
-n3 = net.split(".")[3]
+n0, n1, n2, n3 = net.split(".")
 
 
 ################### Net
-netbin3 = bin(int(n0)).replace("0b", "")
-netbin2 = bin(int(n1)).replace("0b", "")
-netbin1 = bin(int(n2)).replace("0b", "")
-netbin0 = bin(int(n3)).replace("0b", "")
-
-netbin3 = "0" * (8 - len(netbin3)) + netbin3
-netbin2 = "0" * (8 - len(netbin2)) + netbin2
-netbin1 = "0" * (8 - len(netbin1)) + netbin1
-netbin0 = "0" * (8 - len(netbin0)) + netbin0
+netbin3, netbin2, netbin1, netbin0 = [ bin(int(n0)).replace("0b", ""), bin(int(n1)).replace("0b", ""), bin(int(n2)).replace("0b", ""), bin(int(n3)).replace("0b", "") ]
+netbin3, netbin2, netbin1, netbin0 = [ "0" * (8 - len(netbin3)) + netbin3, "0" * (8 - len(netbin2)) + netbin2, "0" * (8 - len(netbin1)) + netbin1,"0" * (8 - len(netbin0)) + netbin0 ]
 
 ################### Mask
 mask1 = 32 - int(mask)
 maskbin = "1" * int(mask) + "0" * mask1
 
-maskbin3 = maskbin[0:8]
-maskbin2 = maskbin[8:16]
-maskbin1 = maskbin[16:24]
-maskbin0 = maskbin[24:32]
-
-maskdec3 = int(maskbin3, 2)
-maskdec2 = int(maskbin2, 2)
-maskdec1 = int(maskbin1, 2)
-maskdec0 = int(maskbin0, 2)
+maskbin3, maskbin2, maskbin1, maskbin0 = [ maskbin[0:8], maskbin[8:16], maskbin[16:24], maskbin[24:32] ]
+maskdec3, maskdec2, maskdec1, maskdec0 = [ int(maskbin3, 2), int(maskbin2, 2), int(maskbin1, 2), int(maskbin0, 2) ]
 
 print("Network:\n{:15}{:15}{:15}{:15}\n{:15}{:15}{:15}{:15}\n".format(n0, n1, n2, n3, netbin3, netbin2, netbin1, netbin0))
 print("Mask:\n/{}\n{:<15}{:<15}{:<15}{:<15}\n{:15}{:15}{:15}{:15}\n".format(mask, maskdec3, maskdec2, maskdec1, maskdec0, maskbin3, maskbin2, maskbin1, maskbin0))
