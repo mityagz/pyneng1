@@ -68,8 +68,8 @@ for i in range(0, 32, 8):
 print(hostList)
 print(bitmaskList)
 
-net_out = "Network:\n{:15}{:15}{:15}{:15}\n{:15}{:15}{:15}{:15}\n"
+net_out = "Network:\n{:<15}{:<15}{:<15}{:<15}\n{:15}{:15}{:15}{:15}\n"
 mask_out = "Mask:\n/{}\n{:<15}{:<15}{:<15}{:<15}\n{:15}{:15}{:15}{:15}\n"
 
-print("Network:\n{:<15}{:<15}{:<15}{:<15}\n{:15}{:15}{:15}{:15}\n".format(int(hostList[0], 2), int(hostList[1], 2), int(hostList[2], 2), int(hostList[3], 2), hostList[0], hostList[1], hostList[2], hostList[3]))
+print(net_out.format(int(hostList[0], 2), int(hostList[1], 2), int(hostList[2], 2), int(hostList[3], 2), hostList[0], hostList[1], hostList[2], hostList[3]))
 print(mask_out.format(mask, int(bitmaskList[0], 2), int(bitmaskList[1], 2), int(bitmaskList[2], 2), int(bitmaskList[3], 2), bitmaskList[0], bitmaskList[1], bitmaskList[2], bitmaskList[3]))
