@@ -13,3 +13,10 @@ Outbound Interface    FastEthernet0/0
 Ограничение: Все задания надо выполнять используя только пройденные темы.
 
 """
+
+out_f = "Prefix {:25}\nAD/Metric {:25}\nNext-Hop {:25}\nLast update {:25}\nOutbound Interface {:25}\n"
+
+with open("exercises/07_files/ospf.txt", 'r') as ospf_f:
+    for l in ospf_f:
+        al = ((l.strip().replace(',', '').replace('[', '').replace(']', '').split()))
+        print(out_f.format(al[1], al[2], al[4], al[5], al[6]))
