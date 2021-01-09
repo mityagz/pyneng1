@@ -40,3 +40,10 @@ interface Ethernet0/3
 ...
 
 """
+import sys
+
+with open(sys.argv[1], 'r') as f:
+    for l in f:
+        ar = l.strip()
+        if not ar.startswith('!'):
+            print(ar)
