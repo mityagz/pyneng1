@@ -21,3 +21,22 @@
 
 Ограничение: Все задания надо выполнять используя только пройденные темы.
 """
+
+def get_int_vlan_map(config_filename):
+    with open(config_filename, 'r') as conf:
+        a = {}
+        t = {}
+        for l in conf:
+            if l.startswith('interface'):
+                intf = l.split()[1]
+            elif l.startswith(' switchport access vlan'):
+                vid = l.split()[-1]
+                if not vid.isdigit():
+                    vid = 1
+                a[intf] = int(vid)
+            elif l.startswith(' switchport trunk allowed vlan'):
+                vid_list = l.split()[-1]
+                t[intf] = [ int(v) for v in vid_list.split(',') ]
+    return (a, t)
+
+print(get_int_vlan_map('config_sw1.txt'))
