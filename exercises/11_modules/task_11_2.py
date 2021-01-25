@@ -41,11 +41,22 @@ Cгенерировать топологию, которая соответст�
 > pip install graphviz
 
 """
+from draw_network_graph import draw_topology
+from task_11_1 import parse_cdp_neighbors
 
 # эти заготовки написаны чтобы показать в какой момент должна
 # рисоваться топология (после вызова функции)
 def create_network_map(filenames):
-    pass
+    r = {}
+    res = {}
+    for f in filenames:
+        with open(f, 'r') as ff:
+            l = ff.read()
+            r = parse_cdp_neighbors(l)
+            for k, v in r.items():
+                if not res.get(k) and not res.get(v):
+                    res[k] = v
+    return res
 
 
 if __name__ == "__main__":
@@ -57,5 +68,6 @@ if __name__ == "__main__":
     ]
 
     topology = create_network_map(infiles)
+    #print(topology)
     # рисуем топологию:
-    # draw_topology(topology)
+    draw_topology(topology)
