@@ -25,3 +25,43 @@ Ethernet0/1 соответствует список из двух кортеже
 диапазоны адресов и так далее, так как обрабатывается вывод команды, а не ввод пользователя.
 
 """
+
+import re
+
+def get_ip_from_cfg(conf_file):
+    result = {}
+    regex = re.compile(r'interface (?P<intf>\S+)\n'
+                       r'( description.*\n)?( bandwidth \d+\n)? '
+                       r'(?:ip address (?P<ip>\S+) (?P<mask>\S+)\n)'
+                       r'(?: ip address (?P<ip_sec>\S+) (?P<mask_sec>\S+) secondary\n)?')
+
+    with open(conf_file, 'r') as f:
+        conf = f.read()
+        match_iter = regex.finditer(conf)
+        for match in match_iter:
+            result[match.group('intf')] =  []
+            result[match.group('intf')].append(match.group('ip', 'mask'))
+            if match.group('ip_sec') != None:
+                result[match.group('intf')].append(match.group('ip_sec', 'mask_sec'))
+            print(match.groups())
+    return result
+
+def get_ip_from_cfg0(conf_file):
+    result = {}
+    regex = re.compile(r'^interface (?P<intf>\S+)|(?: ip address (?P<ip>\S+) (?P<mask>\S+))')
+
+    with open(conf_file, 'r') as f:
+        for l in f:
+            match = regex.search(l)
+            if match:
+                if match.lastgroup == 'intf':
+                    intf = match.group('intf')
+                if match.lastgroup == 'mask':
+                    if result.get(intf) ==  None:
+                        result[intf] = []
+                    ip, mask = match.group('ip', 'mask')
+                    result[intf].append((ip, mask))
+    return result
+
+if __name__ == '__main__':
+    print(get_ip_from_cfg('config_r2.txt'))
