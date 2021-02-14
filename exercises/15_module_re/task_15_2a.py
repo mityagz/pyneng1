@@ -33,3 +33,17 @@ data = [
     ("R2", "15.2(2)T1", "Cisco 2911"),
     ("SW1", "12.2(55)SE9", "Cisco WS-C2960-8TC-L"),
 ]
+
+def convert_to_dict0(lfields, ltvalues):
+    r = []
+    for value in ltvalues:
+        x = dict(zip(lfields, value))
+        r.append(x)
+    return r
+
+def convert_to_dict(lfields, ltvalues):
+    r = [ dict(zip(lfields, value)) for value in ltvalues ]
+    return r
+
+if __name__ == '__main__':
+    convert_to_dict(headers, data)
