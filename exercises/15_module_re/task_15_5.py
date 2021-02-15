@@ -24,3 +24,16 @@ description Connected to SW1 port Eth 0/1
 
 Проверить работу функции на файле sh_cdp_n_sw1.txt.
 """
+
+import re
+
+def generate_description_from_cdp(fconf):
+    with open(fconf) as f:
+        conf = f.read()
+        regexp = (r'(?P<dev>\S+)\s+(?P<lintf>\w+ \S+)\s+\d+\s+(\w| )+\s+(?P<rintf>\w+ \S+)')
+        miter = re.finditer(regexp, conf)
+        if miter:
+            return { iter.group('lintf') : 'description Connected to {} port {}'.format(iter.group('dev'), iter.group('rintf')) for iter in miter }
+
+if __name__ == '__main__':
+    print(generate_description_from_cdp('sh_cdp_n_sw1.txt'))
