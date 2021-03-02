@@ -40,8 +40,65 @@
 """
 
 import glob
+import re
+import csv
 
 sh_version_files = glob.glob("sh_vers*")
 # print(sh_version_files)
 
 headers = ["hostname", "ios", "image", "uptime"]
+
+def parse_sh_version0(sh_ver):
+    m = re.search(r'Cisco IOS Software.*Version (?P<ver>\S+), RELEASE SOFTW', sh_ver)
+    m1 = re.search(r'router uptime is (?P<uptime>.*)\n', sh_ver)
+    m2 =  re.search(r'System image file is (?P<image>.*)', sh_ver)
+    if m and m1 and m2:
+        return("{}".format(m.group('ver')), "{}".format(m2.group('image')), m1.group('uptime'))
+
+def parse_sh_versioni1(sh_ver):
+    #m = re.search(r'^Cisco IOS Software, .*, Version (?P<ver>\S+), RELEASE SOFTW.*\n'
+    #              r'.*router uptime is (?P<uptime>.*)\n.*\n'
+    #              r'.*System image file is \"(?P<image>.*)\"\n.*', sh_ver, re.DOTALL)
+    m = re.search(r'Cisco IOS Software, .*, Version (?P<ver>\S+), RELEASE SOFTW.*\n.*'
+                  r'.*router uptime is (?P<uptime>.*)\n.*\n'
+                  r'.*System image file is \"(?P<image>.*)\"\n.*', sh_ver, re.DOTALL)
+    if m:
+        print("{}".format(m.group('ver')), "{}".format(m.group('image')), m.group('uptime'))
+        return("{}".format(m.group('ver')), "{}".format(m.group('image')), m.group('uptime'))
+
+def parse_sh_version2(sh_ver):
+    parsed = {}
+    for l in sh_ver.split('\n'):
+        m = re.search(r'Cisco IOS Software, .*, Version (?P<ver>\S+), RELEASE SOFTW'
+                      r'|System image file is \"(?P<image>.*)\"'
+                      r'|router uptime is (?P<uptime>.*)', l)
+        if m:
+            parsed[m.lastgroup] = m.group(m.lastgroup)
+    return("{}".format(parsed['ver']), "{}".format(parsed['image']), parsed['uptime'])
+
+def parse_sh_version(sh_ver):
+    m = re.search(r'^Cisco IOS Software, (\S|\w|\d|\s)*?, Version (?P<ver>\S+)?, RELEASE SOFTW.*'
+                  r'router uptime is (?P<uptime>.*)\n.*\n'
+                  r'System image file is \"(?P<image>.*)\"\n.*', sh_ver, re.DOTALL)
+    if m:
+        return("{}".format(m.group('ver')), "{}".format(m.group('image')), m.group('uptime'))
+
+def write_inventory_to_csv(data_filenames, csv_filename):
+    res = []
+    for filename in data_filenames:
+        matchhost = re.search(r'.*_(?P<host>\S+).txt', filename)
+        if matchhost:
+            host = matchhost.group('host')
+            with open(filename, 'r') as f:
+                r = list(parse_sh_version(f.read()))
+                r.insert(0, host)
+                res.append(r)
+    res.insert(0, headers)
+
+    with open(csv_filename, 'w') as f:
+        writer = csv.writer(f)
+        for row in res:
+            writer.writerow(row)
+
+if __name__ == '__main__':
+    write_inventory_to_csv(sh_version_files, 'routers_inventory.csv')
