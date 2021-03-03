@@ -24,3 +24,25 @@ R6           Fa 0/2          143           R S I           2811       Fa 0/0
 
 Проверить работу функции на содержимом файла sh_cdp_n_sw1.txt
 """
+
+import re
+
+def parse_sh_cdp_neighbors(sh_cdp_nei):
+    res = {}
+    m0 = re.search(r'(?P<lhost>\S+)>show cdp neighbors', sh_cdp_nei)
+    m1 = re.finditer(r'(?P<rhost>\S+)\s+(?P<lintf>\w+ \S+)\s+\d+.*\d+\s+(?P<rintf>\w+ \S+)', sh_cdp_nei)
+    if m0 and m1:
+        lhost = m0.group('lhost')
+        for m in m1:
+            if res.get(m0.group('lhost')) == None:
+                res[m0.group('lhost')] = {}
+            if res.get(m0.group('lhost')).get(m.group('lintf')) == None:
+                res[m0.group('lhost')][m.group('lintf')] = {}
+                res[m0.group('lhost')][m.group('lintf')][m.group('rhost')] = m.group('rintf')
+    return(res)
+
+
+if __name__ == '__main__':
+    with open('sh_cdp_n_sw1.txt', 'r') as f:
+        sh = f.read()
+        print(parse_sh_cdp_neighbors(sh))
