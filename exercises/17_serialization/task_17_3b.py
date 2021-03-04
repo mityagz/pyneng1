@@ -32,3 +32,22 @@
 > pip install graphviz
 
 """
+
+import yaml
+from pprint import pprint
+from draw_network_graph import draw_topology
+
+def transform_topology(yfile):
+    res = {}
+    with open(yfile) as f:
+        topo = yaml.safe_load(f)
+    for lh, nei0 in topo.items():
+        for lp, nei1 in nei0.items():
+            for rp, rh in nei1.items():
+                if res.get((rp, rh)) == None:
+                    res[(lh, lp)] = (rp, rh)
+    return(res)
+
+if __name__ == '__main__':
+    topo = transform_topology('topology.yaml')
+    draw_topology(topo, 'topo')
