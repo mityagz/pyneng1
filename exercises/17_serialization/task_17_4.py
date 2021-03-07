@@ -40,6 +40,33 @@ C-3PO,c3po@gmail.com,16/12/2019 17:24
 """
 
 import datetime
+import csv
+
+
+def write_last_log_to_csv(source_log, output):
+    ml = {}
+    with open(source_log) as fin:
+        reader = csv.reader(fin)
+        headers = next(reader)
+        maillog = list(reader)
+        for l in maillog:
+            ml[l[1]] = [l[0], convert_str_to_datetime(l[2])]
+        for x in maillog:
+            if convert_str_to_datetime(x[2]) > ml[x[1]][1]:
+                ml[x[1]][1] = convert_str_to_datetime(x[2])
+                ml[x[1]][0] = x[0]
+
+
+    res = []
+    for id, l in ml.items():
+        res.append([l[0], id, convert_datetime_to_str(l[1])])
+    res.insert(0, headers)
+
+
+    with open(output, 'w') as fout:
+        writer = csv.writer(fout)
+        for row in res:
+            writer.writerow(row)
 
 
 def convert_str_to_datetime(datetime_str):
@@ -54,3 +81,8 @@ def convert_datetime_to_str(datetime_obj):
     Конвертирует строку с датой в формате 11/10/2019 14:05 в объект datetime.
     """
     return datetime.datetime.strftime(datetime_obj, "%d/%m/%Y %H:%M")
+
+
+
+if __name__ == '__main__':
+    write_last_log_to_csv('mail_log.csv', 'out.csv')
