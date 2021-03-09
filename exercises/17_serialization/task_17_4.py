@@ -43,7 +43,7 @@ import datetime
 import csv
 
 
-def write_last_log_to_csv(source_log, output):
+def write_last_log_to_csv0(source_log, output):
     ml = {}
     with open(source_log) as fin:
         reader = csv.reader(fin)
@@ -68,6 +68,25 @@ def write_last_log_to_csv(source_log, output):
         for row in res:
             writer.writerow(row)
 
+def write_last_log_to_csv(source_log, output):
+    res = {}
+    res_list =[]
+    with open(source_log) as fin:
+        reader = csv.reader(fin)
+        headers = next(reader)
+        maillog = list(reader)
+        sorted_log = sorted(maillog, key = lambda x : convert_str_to_datetime(x[2]))
+        for l in sorted_log:
+            res[l[1]] = [l[0], l[2]]
+        for k, v in res.items():
+            h = [v[0], k, v[1]]
+            res_list.append(h)
+        res_list.insert(0, headers)
+
+    with open(output, 'w') as fout:
+        writer = csv.writer(fout)
+        for row in res_list:
+            writer.writerow(row)
 
 def convert_str_to_datetime(datetime_str):
     """
