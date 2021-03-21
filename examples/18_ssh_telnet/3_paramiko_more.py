@@ -25,9 +25,9 @@ def send_show_command(
         allow_agent=False,
     )
     with cl.invoke_shell() as ssh:
-        ssh.send("enable\n")
-        ssh.send(enable + "\n")
-        time.sleep(short_pause)
+        #ssh.send("enable\n")
+        #ssh.send(enable + "\n")
+        #time.sleep(short_pause)
         ssh.recv(max_bytes)
 
         result = {}
@@ -43,9 +43,10 @@ def send_show_command(
                     time.sleep(0.5)
                 except socket.timeout:
                     break
-                if "More" in page:
+                if "more" in page:
                     ssh.send(" ")
-            output = re.sub(" +--More--| +\x08+ +\x08+", "\n", output)
+            #output = re.sub(" +--More--| +\x08+ +\x08+", "\n", output)
+            output = re.sub("\-{3}\(more( \d{1,3}\%)?\)\-{3}", "\n", output)
             result[command] = output
 
         return result
@@ -53,6 +54,6 @@ def send_show_command(
 
 if __name__ == "__main__":
     devices = ["192.168.100.1", "192.168.100.2", "192.168.100.3"]
-    commands = ["sh run"]
-    result = send_show_command("192.168.100.1", "cisco", "cisco", "cisco", commands)
+    commands = ["show configuration"]
+    result = send_show_command("10.248.0.65", "am", "qwerty", "cisco", commands)
     pprint(result, width=120)
