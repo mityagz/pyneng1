@@ -24,10 +24,10 @@ def send_show_command(
         allow_agent=False,
     )
     with cl.invoke_shell() as ssh:
-        ssh.send("enable\n")
-        ssh.send(enable + "\n")
-        time.sleep(short_pause)
-        ssh.send("terminal length 0\n")
+        #ssh.send("enable\n")
+        #ssh.send(enable + "\n")
+        #time.sleep(short_pause)
+        ssh.send("set cli screen-length 0\n")
         time.sleep(short_pause)
         ssh.recv(max_bytes)
 
@@ -51,6 +51,6 @@ def send_show_command(
 
 if __name__ == "__main__":
     devices = ["192.168.100.1", "192.168.100.2", "192.168.100.3"]
-    commands = ["sh clock", "sh arp"]
-    result = send_show_command("192.168.100.1", "cisco", "cisco", "cisco", commands)
+    commands = ["show system uptime", "show arp"]
+    result = send_show_command("10.248.0.65", "am", "qwerty", "cisco", commands)
     pprint(result, width=120)
