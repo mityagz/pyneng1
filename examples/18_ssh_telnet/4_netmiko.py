@@ -11,7 +11,7 @@ def send_show_command(device, commands):
     result = {}
     try:
         with ConnectHandler(**device) as ssh:
-            ssh.enable()
+            #ssh.enable()
             for command in commands:
                 output = ssh.send_command(command)
                 result[command] = output
@@ -24,5 +24,5 @@ if __name__ == "__main__":
     with open("devices.yaml") as f:
         devices = yaml.safe_load(f)
     for device in devices:
-        result = send_show_command(device, ["sh clock", "sh ip int br"])
+        result = send_show_command(device, ["show system uptime", "show arp"])
         pprint(result, width=120)
