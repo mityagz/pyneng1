@@ -11,7 +11,7 @@ def send_show_command(device, commands):
     result = {}
     try:
         with ConnectHandler(**device) as ssh:
-            ssh.enable()
+            #ssh.enable()
             for command in commands:
                 output = ssh.send_command(command)
                 result[command] = output
@@ -22,11 +22,11 @@ def send_show_command(device, commands):
 
 if __name__ == "__main__":
     device = {
-        "device_type": "cisco_ios_telnet",
-        "ip": "192.168.100.1",
-        "username": "cisco",
-        "password": "cisco",
+        "device_type": "juniper_junos_telnet",
+        "ip": "10.248.0.65",
+        "username": "am",
+        "password": "qwerty",
         "secret": "cisco",
     }
-    result = send_show_command(device, ["sh clock", "sh ip int br"])
+    result = send_show_command(device, ["show system uptime", "show arp"])
     pprint(result, width=120)
