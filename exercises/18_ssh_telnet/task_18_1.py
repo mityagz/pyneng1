@@ -16,11 +16,24 @@
 
 """
 import yaml
+from netmiko import (
+    ConnectHandler,
+    NetmikoTimeoutException,
+    NetmikoAuthenticationException,
+)
 
+def send_show_command(device, command):
+    result = {}
+    try:
+        with ConnectHandler(**device) as ssh:
+            output = ssh.send_command(command)
+            return output
+    except (NetmikoTimeoutException, NetmikoAuthenticationException) as error:
+        print(error)
 
 
 if __name__ == "__main__":
-    command = "sh ip int br"
+    command = "show interfaces brief"
     with open("devices.yaml") as f:
         devices = yaml.safe_load(f)
 
