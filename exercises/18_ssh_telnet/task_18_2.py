@@ -41,4 +41,34 @@ R1#
 Скрипт должен отправлять команду command на все устройства из файла devices.yaml с помощью функции send_config_commands.
 """
 
-commands = ["logging 10.255.255.1", "logging buffered 20010", "no logging console"]
+commands = ["set system login user cisco1 authentication encrypted-password \"$1$ABzJUPdE$NvSj.G1FVSjPrcZURlgwF0\"", "set system login user cisco1 class super-user"]
+
+import yaml
+from netmiko import ConnectHandler
+from paramiko.ssh_exception import AuthenticationException
+from netmiko.ssh_exception import NetmikoTimeoutException
+
+def send_config_commands(device, config_commands):
+    result = {}
+    try:
+        with ConnectHandler(**device) as ssh:
+            output = ssh.config_mode()
+            output += ssh.send_config_set(config_commands)
+            ssh.commit()
+            return output
+    except (AuthenticationException) as auth_error:
+        print(auth_error)
+        print("Authentication on {} is fail".format(device['host']))
+    except (NetmikoTimeoutException) as timeout_error:
+        print(timeout_error)
+        print("Connection to {} is fail, timeout raise".format(device['host']))
+    except (IOError) as io_err:
+        print(io_err)
+        print("IOError to {} appeared".format(device['host']))
+
+if __name__ == "__main__":
+    with open("devices.yaml") as f:
+        devices = yaml.safe_load(f)
+
+    for dev in devices:
+        print(send_config_commands(dev, commands))
