@@ -41,7 +41,78 @@ router ospf 1
 # Этот словарь нужен только для проверки работа кода, в нем можно менять IP-адреса
 # тест берет адреса из файла devices.yaml
 commands = {
-    "192.168.100.3": "sh run | s ^router ospf",
-    "192.168.100.1": "sh ip int br",
-    "192.168.100.2": "sh int desc",
+    "10.240.0.65": "show configuration protocols ospf",
+    "10.240.0.66": "show interfaces brief",
+    "10.248.0.65": "show interfaces descriptions",
+    "10.248.0.66": "show interfaces descriptions",
 }
+
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from pprint import pprint
+from datetime import datetime
+import time
+from itertools import repeat
+import logging
+
+import yaml
+from netmiko import ConnectHandler
+
+from paramiko.ssh_exception import AuthenticationException
+#from netmiko.ssh_exception import NetmikoTimeoutException
+
+logging.getLogger("paramiko").setLevel(logging.WARNING)
+
+logging.basicConfig(
+    format = '%(threadName)s %(name)s %(levelname)s: %(message)s',
+    level=logging.INFO)
+
+start_msg = '===> {} Connection: {}'
+received_msg = '<=== {} Received: {}'
+
+
+def send_show(device_dict, command):
+    ip = device_dict['ip']
+    logging.info(start_msg.format(datetime.now().time(), ip))
+    with ConnectHandler(**device_dict) as ssh:
+        prompt = ssh.find_prompt()
+        ssh.write_channel(f"{command}\n")
+        output = ""
+        while True:
+            try:
+                page = ssh.read_until_pattern(f"More|{prompt}")
+                output += page
+                if "More" in page:
+                    ssh.write_channel(" ")
+                elif prompt in output:
+                    break
+            except NetmikoTimeoutException:
+                break
+        logging.info(received_msg.format(datetime.now().time(), ip))
+        return {ip: output}
+
+
+def send_command_to_devices(devices, commands_dict, filename, limit=3):
+    data = {}
+    log = []
+    futures_ssh = []
+    with ThreadPoolExecutor(max_workers=limit) as executor:
+        future_ssh = [ executor.submit(send_show, device, commands[device['ip']]) for device in devices ]
+        for f in as_completed(future_ssh):
+            try:
+                result = f.result()
+            except NetMikoAuthenticationException as e:
+                print(e)
+            else:
+                data.update(result)
+    
+    for dev, entry in data.items():
+        log.append("{} : {}".format(dev, entry))
+    with open(filename, 'w') as f:
+        f.writelines(log)
+    return data
+
+
+if __name__ == '__main__':
+    with open('devices0.yaml') as f:
+        devices = yaml.safe_load(f)
+    pprint(send_command_to_devices(devices, commands, "commands_result.log", 4))
