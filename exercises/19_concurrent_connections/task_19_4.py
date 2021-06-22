@@ -129,6 +129,7 @@ def send_show_commands(device_dict, command):
     with ConnectHandler(**device_dict) as ssh:
         prompt = ssh.find_prompt()
         ssh.write_channel(f"{command}\n")
+        #output = prompt + command
         output = ""
         while True:
             try:
@@ -143,9 +144,9 @@ def send_show_commands(device_dict, command):
     logging.info(received_msg.format(datetime.now().time(), ip))
     return {ip: output}
 
-
 def send_config_commands(device, config_commands):
     result = {}
+    output = ""
     ip = device['ip']
     logging.info(start_msg.format(datetime.now().time(), ip))
     try:
@@ -198,7 +199,8 @@ def send_commands_to_devices(devices, filename, limit = 3, *, show = None, confi
 
     for dev, entries in data_e.items():
         for entry in data_e[dev]:
-            log.append("{} : {}".format(dev, entry))
+           #log.append("{} : {}".format(dev, entry))
+           log.append("{}".format(entry))
     with open(filename, 'w') as f:
         f.writelines(log)
     return data_e
