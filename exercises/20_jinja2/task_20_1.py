@@ -14,7 +14,14 @@
 
 """
 import yaml
+from jinja2 import Environment, FileSystemLoader
+import os
 
+def generate_config(template, data_dict):
+    tmpl_dir, tmpl_file = os.path.split(template)
+    env = Environment(loader=FileSystemLoader(tmpl_dir), trim_blocks=True, lstrip_blocks=True)
+    t = env.get_template(tmpl_file)
+    return t.render(data_dict)
 
 # так должен выглядеть вызов функции
 if __name__ == "__main__":
