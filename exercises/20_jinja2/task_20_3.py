@@ -54,3 +54,39 @@ interface Fa0/1.100
 interface Fa0/1.200
  ip ospf hello-interval 1
 """
+
+import task_20_1 as g
+import yaml
+
+if __name__ == "__main__":
+    data_file = "data_files/ospf.yml"
+    template_file = "templates/ospf.txt"
+    with open(data_file) as f:
+        data = yaml.safe_load(f)
+        print(g.generate_config(template_file, data))
+"""
+!
+router ospf {{ process }}
+ router-id {{ router_id }}
+ auto-cost reference-bandwidth {{ ref_bw }}
+{% if ospf_intf %}
+ {% for ospf_int in ospf_intf %}
+ network {{ ospf_int.ip }} 0.0.0.0 area {{ ospf_int.area }}
+ {% endfor %}
+ {% for ospf_int in ospf_intf %}
+ {% if ospf_int.passive %}
+ passive-interface {{ ospf_int.name }}
+ {% endif %}
+ {% endfor %}
+{% endif %}
+!
+{% if ospf_intf %}
+ {% for ospf_int in ospf_intf if not ospf_int.passive %}
+ {#% if ospf_int.passive % /* This 'if ... else' was done whe I didn't know about 'if not'*/ #}
+ {#% else %#}
+interface {{ ospf_int.name }}
+ ip ospf hello-interval 1
+ {#% endif %#}
+ {% endfor %}
+{% endif %}
+"""
