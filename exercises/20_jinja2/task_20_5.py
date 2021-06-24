@@ -33,3 +33,18 @@ data = {
     "tun_ip_1": "10.0.1.1 255.255.255.252",
     "tun_ip_2": "10.0.1.2 255.255.255.252",
 }
+
+import yaml
+from jinja2 import Environment, FileSystemLoader
+import os
+from task_20_1 import generate_config
+
+def create_vpn_config(template1, template2, data_dict):
+    return (generate_config(template1, data_dict), generate_config(template2, data_dict))
+
+# так должен выглядеть вызов функции
+if __name__ == "__main__":
+    template_file1 = "templates/gre_ipsec_vpn_1.txt"
+    template_file2 = "templates/gre_ipsec_vpn_2.txt"
+    print(create_vpn_config(template_file1, template_file2, data))
+
