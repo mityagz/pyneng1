@@ -34,3 +34,72 @@ data = {
     "tun_ip_1": "10.0.1.1 255.255.255.252",
     "tun_ip_2": "10.0.1.2 255.255.255.252",
 }
+
+import yaml
+from jinja2 import Environment, FileSystemLoader
+import os
+from task_20_1 import generate_config
+from task_20_5 import create_vpn_config
+
+def get_first_free_id_of_tun(dev1, dev2):
+    return 0
+
+def conf_vpn(dev, conf):
+    return conf
+
+def configure_vpn(src_device_params, dst_device_params, src_template, dst_template, vpn_data_dict):
+    vpn_data_dict['tun_num'] = get_first_free_id_of_tun(src_device_params, dst_device_params)
+    (c1, c2) = create_vpn_config(src_template, dst_template, data)
+    res_conf1 = conf_vpn(src_device_params, c1)
+    res_conf2 = conf_vpn(dst_device_params, c2)
+    res_conf = res_conf1 + "\n\n\n" + res_conf2
+    return res_conf
+
+
+# так должен выглядеть вызов функции
+if __name__ == "__main__":
+    with open("devices.yaml") as f:
+        devices = yaml.safe_load(f)
+    template_file1 = "templates/gre_ipsec_vpn_1.txt"
+    template_file2 = "templates/gre_ipsec_vpn_2.txt"
+    print(configure_vpn(devices[0], devices[1], template_file1, template_file2, data))
+crypto isakmp policy {{ tun_num }}
+ encr aes
+ authentication pre-share
+ group 5
+ hash sha
+
+"""
+crypto isakmp key cisco address {{ wan_ip_2 }}
+
+crypto ipsec transform-set AESSHA esp-aes esp-sha-hmac
+ mode transport
+
+crypto ipsec profile GRE
+ set transform-set AESSHA
+
+interface Tunnel {{ tun_num }}
+ ip address {{ tun_ip_1}}
+ tunnel source {{ wan_ip_1 }}
+ tunnel destination {{ wan_ip_2 }}
+ tunnel protection ipsec profile GRE
+crypto isakmp policy {{ tun_num }}
+ encr aes
+ authentication pre-share
+ group 5
+ hash sha
+
+crypto isakmp key cisco address {{ wan_ip_1}}
+
+crypto ipsec transform-set AESSHA esp-aes esp-sha-hmac
+ mode transport
+
+crypto ipsec profile GRE
+ set transform-set AESSHA
+
+interface Tunnel {{ tun_num }}
+ ip address {{ tun_ip_2}}
+ tunnel source {{ wan_ip_2 }}
+ tunnel destination {{ wan_ip_1 }}
+ tunnel protection ipsec profile GRE
+ """
