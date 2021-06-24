@@ -48,3 +48,43 @@ if __name__ == "__main__":
     template_file2 = "templates/gre_ipsec_vpn_2.txt"
     print(create_vpn_config(template_file1, template_file2, data))
 
+"""
+crypto isakmp policy {{ tun_num }}
+ encr aes
+ authentication pre-share
+ group 5
+ hash sha
+
+crypto isakmp key cisco address {{ wan_ip_2 }}
+
+crypto ipsec transform-set AESSHA esp-aes esp-sha-hmac
+ mode transport
+
+crypto ipsec profile GRE
+ set transform-set AESSHA
+
+interface Tunnel {{ tun_num }}
+ ip address {{ tun_ip_1}}
+ tunnel source {{ wan_ip_1 }}
+ tunnel destination {{ wan_ip_2 }}
+ tunnel protection ipsec profile GRE
+crypto isakmp policy {{ tun_num }}
+ encr aes
+ authentication pre-share
+ group 5
+ hash sha
+
+crypto isakmp key cisco address {{ wan_ip_1}}
+
+crypto ipsec transform-set AESSHA esp-aes esp-sha-hmac
+ mode transport
+
+crypto ipsec profile GRE
+ set transform-set AESSHA
+
+interface Tunnel {{ tun_num }}
+ ip address {{ tun_ip_2}}
+ tunnel source {{ wan_ip_2 }}
+ tunnel destination {{ wan_ip_1 }}
+ tunnel protection ipsec profile GRE
+ """
