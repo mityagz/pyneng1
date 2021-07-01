@@ -14,6 +14,18 @@
 
 """
 from netmiko import ConnectHandler
+import textfsm
+
+def do_parse(tmpl, show_out):
+    with open(tmpl) as t:
+        re_table = textfsm.TextFSM(t)
+        header = re_table.header
+        res = re_table.ParseText(show_out)
+        res.insert(0, header)
+    return res
+
+def parse_command_output(tmpl, show_out):
+    return (do_parse(tmpl, show_out))
 
 
 # вызов функции должен выглядеть так
@@ -25,8 +37,10 @@ if __name__ == "__main__":
         "password": "cisco",
         "secret": "cisco",
     }
-    with ConnectHandler(**r1_params) as r1:
-        r1.enable()
-        output = r1.send_command("sh ip int br")
+    #with ConnectHandler(**r1_params) as r1:
+        #r1.enable()
+        #output = r1.send_command("sh ip int br")
+    with open("output/sh_ip_int_br.txt") as f, open("output/sh_ip_int_br.txt") as output:
+     output = f.read()
     result = parse_command_output("templates/sh_ip_int_br.template", output)
     print(result)
