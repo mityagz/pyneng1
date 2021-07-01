@@ -32,7 +32,7 @@ def do_parse0(tmpl, show_out):
             r.append(d)
     return r
 
-def do_parse(tmpl, show_out):
+def do_parse1(tmpl, show_out):
     r = []
     with open(tmpl) as t:
         re_table = textfsm.TextFSM(t)
@@ -41,6 +41,14 @@ def do_parse(tmpl, show_out):
         for e in res:
             r.append(dict(zip(header, e)))
     return r
+
+def do_parse(tmpl, show_out):
+    r = []
+    with open(tmpl) as t:
+        re_table = textfsm.TextFSM(t)
+        header = re_table.header
+        res = re_table.ParseText(show_out)
+        return [ dict(zip(header, e)) for e in res ]
 
 def parse_output_to_dict(tmpl, show_out):
     return (do_parse(tmpl, show_out))
