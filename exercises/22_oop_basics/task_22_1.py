@@ -41,3 +41,29 @@ topology_example = {
     ("SW1", "Eth0/2"): ("R2", "Eth0/0"),
     ("SW1", "Eth0/3"): ("R3", "Eth0/0"),
 }
+
+class Topology:
+    def __init__(self, topo):
+        t = {}
+        for i in topo.keys():
+        # it's the first variant
+        #    if i != t.get(topo[i]):
+        #        t[i] = topo[i]
+        # it's the second variant
+            if i == topo.get(topo.get(i)):
+                if t.get(i) == None and t.get(topo.get(i)) == None:
+                    t[i] = topo[i]
+            else:
+                t[i] = topo[i]
+        self.topology = t
+
+    def gettopo(self):
+        return self.topology
+
+def main():
+    top = Topology(topology_example)
+    for t in (top.gettopo()):
+        print(t, (top.gettopo())[t])
+
+if __name__ == "__main__":
+    main()
