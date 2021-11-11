@@ -44,3 +44,48 @@ self._write_line(line)
 
 Он не должен делать ничего другого.
 """
+import telnetlib
+import time
+from pprint import pprint
+import yaml
+
+pe8_p = {
+    'ip': '10.229.10.0',
+    'username': 'am',
+    'password': 'qwerty',
+    'secret': 'qwerty'}
+
+class CiscoTelnet:
+    def __init__(self, ip, username, password, secret):
+            self.telnet = telnetlib.Telnet(ip)
+            self.telnet.read_until(b"Username")
+
+            self._write_line(username)
+            self.telnet.read_until(b"Password")
+            self._write_line(password)
+            index, m, output = self.telnet.expect([b">", b"#"])
+            if index == 0:
+                #self.telnet.write(b"enable\n")
+                self._write_line("enable")
+                self.telnet.read_until(b"Password")
+                self._write_line(secret)
+                self.telnet.read_until(b"#", timeout=5)
+                self._write_line("terminal length 0")
+                self.telnet.read_until(b"#", timeout=5)
+                time.sleep(3)
+                self.telnet.read_very_eager()
+    
+    def _write_line(self, line):
+        return self.telnet.write(line.encode("ascii") + b"\n")
+
+    def send_show_command(self, str_cmd):
+        r = {}
+        self._write_line(str_cmd)
+        output = self.telnet.read_until(b"#", timeout=5).decode("utf-8")
+        #r[command] = output.replace("\r\n", "\n")
+        return output
+
+if __name__ == '__main__':
+    c = CiscoTelnet(**pe8_p)
+    r = c.send_show_command("sh ip int br")
+    pprint(r, width=120)
