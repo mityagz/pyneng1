@@ -31,3 +31,30 @@ In [12]: print(ip_list)
 [IPAddress('10.1.1.1/24')]
 
 """
+
+import re
+
+class IPAddress:
+    def __init__(self, prefix):
+        ip, mask = prefix.split('/')
+
+        if int(mask) < 8 or int(mask) > 32:
+            raise ValueError('Incorrect mask')
+
+        m = re.match(r'(?P<ip>(?:[0-255]{0,3}\.){3}[0-255])', ip)
+        if not m:
+            raise ValueError('Incorrect IPv4 address')
+
+        self.ip = ip
+        self.mask = int(mask)
+        self._prefix = prefix
+
+    def __str__(self):
+        return "IP address {}".format(self._prefix)
+
+    def __repr__(self):
+        return "IPAddress('{}')".format(self._prefix)
+
+if __name__ == '__main__':
+    ip = IPAddress('10.1.1.1/24')
+    print(ip.ip, ip.mask)
