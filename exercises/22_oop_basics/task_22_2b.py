@@ -67,7 +67,7 @@ class CiscoTelnet:
     def _write_line(self, line):
         return self.telnet.write(line.encode("ascii") + b"\n")
 
-    def send_config_command(self, str_cmd):
+    def send_config_commands(self, str_cmd):
         self.output = ''
         self.send_cmd("conf t\n")
         
