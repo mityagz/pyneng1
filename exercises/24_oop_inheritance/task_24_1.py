@@ -20,8 +20,22 @@ Out[4]: 'Interface                  IP-Address      OK? Method Status           
 
 device_params = {
     "device_type": "cisco_ios",
-    "ip": "192.168.100.1",
-    "username": "cisco",
-    "password": "cisco",
-    "secret": "cisco",
+    "ip": "10.229.10.0",
+    "username": "am",
+    "password": "qwerty",
+    "secret": "Dfkmr09",
 }
+
+from base_connect_class import BaseSSH
+
+class CiscoSSH(BaseSSH):
+    def __init__(self, device_type, ip, username, password, secret, disable_paging=True):
+            super().__init__(**device_params)
+            self.ssh.enable()
+            #if disable_paging:
+            #    self.send_cfg_commands('terminal length 0\n')
+            #time.sleep(1)
+
+if __name__ == '__main__':
+    r = CiscoSSH(**device_params)
+    print(r.send_show_command('sh ip int br'))
