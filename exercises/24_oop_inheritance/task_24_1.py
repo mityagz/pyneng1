@@ -23,7 +23,7 @@ device_params = {
     "ip": "10.229.10.0",
     "username": "am",
     "password": "qwerty",
-    "secret": "Dfkmr09",
+    "secret": "cisco",
 }
 
 from base_connect_class import BaseSSH
