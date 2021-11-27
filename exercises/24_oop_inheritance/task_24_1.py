@@ -32,9 +32,25 @@ class CiscoSSH(BaseSSH):
     def __init__(self, device_type, ip, username, password, secret, disable_paging=True):
             super().__init__(**device_params)
             self.ssh.enable()
+            #super().send_cfg_commands('enable\n')
+            #super().send_cfg_commands(secret + '\n')
             #if disable_paging:
             #    self.send_cfg_commands('terminal length 0\n')
             #time.sleep(1)
+    """
+    def _modify_connection_params(self): 
+            paramiko.Transport._preferred_kex = ( 
+                "diffie-hellman-group14-sha1", 
+                "diffie-hellman-group-exchange-sha1", 
+                "diffie-hellman-group-exchange-sha256", 
+                "diffie-hellman-group1-sha1", 
+                ) 
+
+    def _open(self):
+            self._modify_connection_params()
+            self.establish_connection()
+            self._try_session_preparation()
+    """
 
 if __name__ == '__main__':
     r = CiscoSSH(**device_params)
