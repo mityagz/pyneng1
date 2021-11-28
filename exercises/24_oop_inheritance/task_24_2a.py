@@ -38,3 +38,45 @@ class ErrorInCommand(Exception):
     """
     Исключение генерируется, если при выполнении команды на оборудовании, возникла ошибка.
     """
+
+from netmiko.cisco.cisco_ios import CiscoIosSSH
+import re
+
+
+device_params = {
+    "device_type": "cisco_ios",
+    "ip": "10.229.10.0",
+    "username": "am",
+    "password": "qwerty",
+    "secret": "cisco",
+}
+
+
+
+class MyNetmiko(CiscoIosSSH):
+    #def __init__(self, device_type, ip, username, password, secret, disable_paging = True):
+    def __init__(self, **device_params):
+        self.dev_ip = device_params['ip']
+        super().__init__(**device_params)
+        self.enable()
+
+
+    def _check_error_in_command(self, cmd, ocmd):
+            regex = None
+            err = r'% (?P<err>.*)'
+            regex = re.search(err, ocmd)
+            if regex:
+                excn = "При выполнении команды \"{}\" на устройстве {} возникла ошибка {}".format(cmd, self.dev_ip, regex.group('err'))
+                raise ErrorInCommand(excn)
+
+    def send_command(self, cmd):
+        ocmd = super().send_command(cmd)
+        if cmd == 'logging':
+            ocmd = super().send_config_set(cmd)
+        self._check_error_in_command(cmd, ocmd)
+        return ocmd
+
+if __name__ == '__main__':
+    r = MyNetmiko(**device_params)
+    print(r.send_command('sh ip int br'))
+    print(r.send_command('sh ip br'))
